@@ -1,4 +1,4 @@
-FROM registry:2
+FROM registry:latest
 
 LABEL maintainer="xiaonuo danxiaonuo@danxiaonuo.me"
 
