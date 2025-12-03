@@ -20,26 +20,12 @@
 docker build -t registry:custom .
 ```
 
-#### 方式二：根据 REGISTRY_HTTP_ADDR 环境变量自动提取端口
+#### 方式二：使用构建脚本
 
 ```bash
-# 设置环境变量
-export REGISTRY_HTTP_ADDR=:8080
-
-# 使用构建脚本（自动提取端口）
-./build.sh
-
-# 或手动指定端口
-docker build --build-arg REGISTRY_PORT=8080 -t registry:custom .
+# 使用构建脚本
+./build.sh -t registry:custom
 ```
-
-#### 方式三：直接指定构建参数
-
-```bash
-docker build --build-arg REGISTRY_PORT=8080 -t registry:custom .
-```
-
-**注意**：`EXPOSE` 是构建时指令，如果运行时通过 `REGISTRY_HTTP_ADDR` 改变了端口，需要重新构建镜像或使用构建参数来匹配。
 
 ### 运行容器
 
@@ -112,9 +98,8 @@ docker run -e REGISTRY_GENERATE_CONFIG=true ...
 
 - `generate-config.py`: 从环境变量生成配置文件的 Python 脚本
 - `entrypoint.sh`: 容器入口脚本，负责生成配置并启动 Registry
-- `extract-port.sh`: 从 `REGISTRY_HTTP_ADDR` 环境变量中提取端口号的辅助脚本
 - `build.sh`: 构建脚本，自动从 `REGISTRY_HTTP_ADDR` 提取端口并构建镜像
-- `Dockerfile`: 构建自定义 Registry 镜像的 Dockerfile（支持通过 `REGISTRY_PORT` ARG 指定 EXPOSE 端口）
+- `Dockerfile`: 构建自定义 Registry 镜像的 Dockerfile
 - `ENV_VARS_MAPPING.md`: 详细的环境变量映射文档
 - `docker-compose.example.yml`: Docker Compose 示例文件
 
@@ -124,11 +109,7 @@ docker run -e REGISTRY_GENERATE_CONFIG=true ...
 2. 配置文件默认路径为 `/etc/docker/registry/config.yml`
 3. 环境变量名称使用下划线分隔，对应 YAML 配置的层级结构
 4. 列表值使用逗号分隔的字符串表示
-5. **EXPOSE 端口设置**：
-   - `EXPOSE` 是构建时指令，默认端口为 5000
-   - 如果运行时通过 `REGISTRY_HTTP_ADDR` 改变了端口，需要重新构建镜像
-   - 构建时可以通过 `--build-arg REGISTRY_PORT=<port>` 指定 EXPOSE 端口
-   - 或使用 `./build.sh` 脚本，它会自动从 `REGISTRY_HTTP_ADDR` 环境变量提取端口
+5. **端口配置**：通过 `REGISTRY_HTTP_ADDR` 环境变量配置监听地址和端口
 
 ## 故障排查
 
