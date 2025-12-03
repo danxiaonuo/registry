@@ -41,32 +41,6 @@ volumes:
   registry-data:
 ```
 
-### 方式三：构建时指定 EXPOSE 端口
-
-如果需要在构建时根据 `REGISTRY_HTTP_ADDR` 设置 EXPOSE 端口：
-
-**使用构建脚本（推荐）**：
-
-```bash
-# 设置环境变量
-export REGISTRY_HTTP_ADDR=:8080
-
-# 构建镜像（自动提取端口）
-./build.sh -t registry:custom
-```
-
-**手动指定构建参数**：
-
-```bash
-# 构建镜像并指定 EXPOSE 端口
-docker build --build-arg REGISTRY_PORT=8080 -t registry:custom .
-
-# 运行容器
-docker run -d \
-  -e REGISTRY_HTTP_ADDR=:8080 \
-  -p 8080:8080 \
-  registry:custom
-```
 
 ## 环境变量映射表
 
@@ -100,7 +74,7 @@ docker run -d \
 
 | 环境变量 | YAML 路径 | 默认值 | 说明 |
 |---------|----------|--------|------|
-| `REGISTRY_HTTP_ADDR` | `http.addr` | `:5000` | HTTP 监听地址（格式：`:端口` 或 `IP:端口`，如 `:8080`、`0.0.0.0:5000`）。**注意**：此环境变量会影响 Docker 镜像的 `EXPOSE` 端口设置，详见下方"EXPOSE 端口配置"章节 |
+| `REGISTRY_HTTP_ADDR` | `http.addr` | `:5000` | HTTP 监听地址（格式：`:端口` 或 `IP:端口`，如 `:8080`、`0.0.0.0:5000`） |
 | `REGISTRY_HTTP_HEADERS_X_CONTENT_TYPE_OPTIONS` | `http.headers.X-Content-Type-Options` | `nosniff` | 安全头 |
 | `REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_ORIGIN` | `http.headers.Access-Control-Allow-Origin` | `*` | CORS 允许来源 |
 | `REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_METHODS` | `http.headers.Access-Control-Allow-Methods` | `HEAD,GET,OPTIONS,DELETE` | CORS 允许方法（逗号分隔） |
@@ -149,35 +123,7 @@ REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_METHODS="HEAD,GET,OPTIONS,DELETE"
 - `1728000` → 整数 1728000
 - `3.14` → 浮点数 3.14
 
-### EXPOSE 端口配置
-
-Docker 镜像的 `EXPOSE` 端口可以通过构建参数 `REGISTRY_PORT` 指定，默认值为 `5000`。
-
-#### 构建时指定端口
-
-**方式一：使用构建参数**
-
-```bash
-docker build --build-arg REGISTRY_PORT=8080 -t registry:custom .
-```
-
-**方式二：使用构建脚本（自动从 REGISTRY_HTTP_ADDR 提取端口）**
-
-```bash
-# 设置环境变量
-export REGISTRY_HTTP_ADDR=:8080
-
-# 使用构建脚本自动提取端口
-./build.sh
-```
-
-**方式三：使用默认端口（5000）**
-
-```bash
-docker build -t registry:custom .
-```
-
-#### 端口格式说明
+### 端口格式说明
 
 `REGISTRY_HTTP_ADDR` 支持以下格式：
 - `:5000` - 监听所有接口的 5000 端口（默认）
@@ -185,14 +131,7 @@ docker build -t registry:custom .
 - `127.0.0.1:5000` - 仅监听本地回环接口的 5000 端口
 - `localhost:9000` - 监听 localhost 的 9000 端口
 
-构建脚本会自动从这些格式中提取端口号。
-
-#### 注意事项
-
-1. **EXPOSE 是构建时指令**：`EXPOSE` 在镜像构建时确定，不能使用运行时的环境变量
-2. **端口一致性**：建议构建时的 `REGISTRY_PORT` 与运行时的 `REGISTRY_HTTP_ADDR` 端口保持一致
-3. **重新构建**：如果运行时改变了 `REGISTRY_HTTP_ADDR` 的端口，需要重新构建镜像以更新 `EXPOSE`
-4. **端口映射**：在 `docker run` 或 `docker-compose.yml` 中，确保端口映射与 `REGISTRY_HTTP_ADDR` 匹配
+**注意**：在 `docker run` 或 `docker-compose.yml` 中，确保端口映射与 `REGISTRY_HTTP_ADDR` 匹配。
 
 ## 配置生成
 
@@ -267,12 +206,7 @@ export REGISTRY_PROXY_TTL=168h
 3. **Python 依赖**：需要 Python3 和 PyYAML 库
 4. **大小写敏感**：环境变量名称不区分大小写，但建议使用大写
 5. **空值处理**：空字符串会被转换为 `null`
-6. **EXPOSE 端口设置**：
-   - `EXPOSE` 是构建时指令，默认端口为 `5000`
-   - 构建时可以通过 `--build-arg REGISTRY_PORT=<port>` 指定 EXPOSE 端口
-   - 或使用 `./build.sh` 脚本，它会自动从 `REGISTRY_HTTP_ADDR` 环境变量提取端口
-   - 如果运行时通过 `REGISTRY_HTTP_ADDR` 改变了端口，需要重新构建镜像以匹配新端口
-   - 建议构建时的 `REGISTRY_PORT` 与运行时的 `REGISTRY_HTTP_ADDR` 端口保持一致
+6. **端口配置**：通过 `REGISTRY_HTTP_ADDR` 环境变量配置监听地址和端口，无需在 Dockerfile 中设置 EXPOSE
 
 ## 故障排查
 
@@ -293,3 +227,4 @@ docker logs <container_id>
 ```bash
 docker exec <container_id> python3 /usr/local/bin/generate-config.py
 ```
+
