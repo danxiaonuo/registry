@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  registry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: registry:custom
+    container_name: docker-registry
+    ports:
+      - "5000:5000"
+    environment:
+      # 版本
+      - REGISTRY_VERSION=0.1
+
+      # 日志配置
+      - REGISTRY_LOG_ACCESSLOG_DISABLED=true
+      - REGISTRY_LOG_LEVEL=info
+      - REGISTRY_LOG_FORMATTER=text
+      - REGISTRY_LOG_FIELDS_SERVICE=registry
+      - REGISTRY_LOG_FIELDS_ENVIRONMENT=staging
+
+      # 存储配置
+      - REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR=inmemory
+      - REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry
+      - REGISTRY_STORAGE_MAINTENANCE_UPLOADPURGING_ENABLED=false
+      - REGISTRY_STORAGE_TAG_CONCURRENCYLIMIT=8
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
+
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5000
+      - REGISTRY_HTTP_HEADERS_X_CONTENT_TYPE_OPTIONS=nosniff
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_ORIGIN=*
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_METHODS=HEAD,GET,OPTIONS,DELETE
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_HEADERS=Authorization,Accept,Cache-Control
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_MAX_AGE=1728000
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_ALLOW_CREDENTIALS=true
+      - REGISTRY_HTTP_HEADERS_ACCESS_CONTROL_EXPOSE_HEADERS=Docker-Content-Digest
+
+      # 健康检查配置
+      - REGISTRY_HEALTH_STORAGEDRIVER_ENABLED=true
+      - REGISTRY_HEALTH_STORAGEDRIVER_INTERVAL=10s
+      - REGISTRY_HEALTH_STORAGEDRIVER_THRESHOLD=3
+
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+
+      # 配置生成选项
+      - REGISTRY_GENERATE_CONFIG=true
+      - REGISTRY_CONFIG_PATH=/etc/docker/registry/config.yml
+    volumes:
+      - registry-data:/var/lib/registry
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/v2/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  registry-data:
+    driver: local
+
