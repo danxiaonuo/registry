@@ -21,10 +21,6 @@ RUN chmod +x /usr/local/bin/generate-config.py
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# 复制端口提取脚本（用于辅助功能）
-COPY extract-port.sh /usr/local/bin/extract-port.sh
-RUN chmod +x /usr/local/bin/extract-port.sh
-
 # 设置入口点
 # entrypoint.sh 会处理无参数的情况，自动使用默认配置
 ENTRYPOINT ["/entrypoint.sh"]
