@@ -1,0 +1,562 @@
+services:
+  
+  # 服务名
+  dockerhub:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: dockerhub
+    # 指定容器名称
+    container_name: dockerhub
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5000:5000"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5000
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+ 
+  # 服务名
+  quay:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: quay
+    # 指定容器名称
+    container_name: quay
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5001:5001"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5001
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://quay.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  gcr:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: gcr
+    # 指定容器名称
+    container_name: gcr
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5002:5002"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5002
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://gcr.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  k8s-gcr:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: k8s-gcr
+    # 指定容器名称
+    container_name: k8s-gcr
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5003:5003"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5003
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://k8s.gcr.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  k8s:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: k8s
+    # 指定容器名称
+    container_name: k8s
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5004:5004"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5004
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://registry.k8s.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  ghcr:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: ghcr
+    # 指定容器名称
+    container_name: ghcr
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5005:5005"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5005
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://ghcr.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  cloudsmith:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: cloudsmith
+    # 指定容器名称
+    container_name: cloudsmith
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5006:5006"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5006
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://docker.cloudsmith.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  ecr:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: ecr
+    # 指定容器名称
+    container_name: ecr
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5007:5007"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5007
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://public.ecr.aws
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+  # 服务名
+  nvcr:
+    # 模拟一个伪终端
+    tty: true
+    # 打开标准输入,可以接受外部输入
+    stdin_open: true
+    # 主机名
+    hostname: nvcr
+    # 指定容器名称
+    container_name: nvcr
+    # 指定为镜像名称或镜像ID
+    image: danxiaonuo/registry:latest
+    # 覆盖容器启动后默认执行的命令
+    # command: /sbin/init
+    # 允许容器中运行一些特权命令
+    privileged: true
+    # 指定容器退出后的重启策略为始终重启
+    restart: always
+    # 指定容器的内核能力(capacity)分配
+    cap_add:
+     - ALL
+    # 配置容器内核参数
+    sysctls:
+      - net.ipv4.tcp_ecn=1
+      - net.ipv4.tcp_ecn_fallback=1
+      - net.ipv4.tcp_congestion_control=bbrplus
+    # 数据卷所挂载路径设置
+    tmpfs:
+      - /var/lib/registry
+    volumes:
+      # 数据目录
+      #- ./registry/data:/var/lib/registry
+      # 同步宿主机时区与时间
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro,cached
+      - /etc/localtime:/etc/localtime:ro,cached
+      # 共享内核
+      - /lib/modules:/lib/modules:ro,cached
+      - /etc/sysctl.conf:/etc/sysctl.conf:ro,cached
+    # 配置容器连接的网络
+    networks:
+      - registry
+    # 暴露端口信息
+    ports:
+    - "5008:5008"
+    # 环境变量
+    environment:
+      # HTTP 配置
+      - REGISTRY_HTTP_ADDR=:5008
+      # 代理配置
+      - REGISTRY_PROXY_REMOTEURL=https://nvcr.io
+      - REGISTRY_PROXY_USERNAME=
+      - REGISTRY_PROXY_PASSWORD=
+      - REGISTRY_PROXY_TTL=168h
+    # 指定容器的 ulimits 限制值
+    ulimits:
+      nproc: 65535
+      nofile:
+          soft: 65535
+          hard: 65535
+
+            
+networks:
+  registry:
+    driver: bridge
+    enable_ipv6: true
+    driver_opts:
+      com.docker.network.bridge.name: registry
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_forwarding: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
+      com.docker.network.bridge.host_binding_ipv6: "::/0"
+      com.docker.network.driver.mtu: 1500
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.20.0.0/24
+        gateway: 172.20.0.1
+      - subnet: fd99::/64
+        gateway: fd99::1
